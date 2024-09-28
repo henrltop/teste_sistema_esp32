@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #555;
+        }
+        .status {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .status.connected {
+            color: #28a745;
+        }
+        .status.disconnected {
+            color: #dc3545;
+        }
+        .commands {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .commands button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .commands button:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ESP32 Monitor</h1>
+
+    <div class="status {% if connected %}connected{% else %}disconnected{% endif %}">
+        Status do ESP32: {% if connected %} Conectado {% else %} Desconectado {% endif %}
+    </div>
+
+    <h2>Dados Recebidos: {{ data }}</h2>
+
+    <div class="commands">
+        <button onclick="sendCommand('comando1')">Comando 1</button>
+        <button onclick="sendCommand('comando2')">Comando 2</button>
+        <button onclick="sendCommand('comando3')">Comando 3</button>
+    </div>
+
+    <footer>
+        &copy; 2024 - Monitor de ESP32
+    </footer>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function sendCommand(command) {
+            fetch('/send_command/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: 'command=' + command
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Comando enviado: ' + command);
+            });
+        }
+    </script>
+
+</body>
+</html>
